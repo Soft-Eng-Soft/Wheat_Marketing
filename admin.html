@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الإدارة العامة - شركة التسويق</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* متغيرات الألوان والخط */
+        :root { 
+            --primary-color: #2e7d32; 
+            --text-color: #333; 
+            --error-color: #d32f2f; 
+            --disabled-color: #bdbdbd; 
+            --header-bg: #003366; /* لون خلفية الهيئة العامة */
+            --wheat-color: #fbc02d; /* لون القمحافظة الذهبي في الشعار */
+            --white: #fff;
+            --bg-color: #f4f6f8; 
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --radius: 8px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); padding: 20px; }
+
+        /* تصميم الشعار (تعديل لجعل الخط واضحاً وواضح) */
+        .main-header {
+            background-color: var(--header-bg);
+            color: var(--white);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border-bottom: 4px solid var(--wheat-color); /* إطار ذهبي واضح */
+            margin-bottom: 20px;
+        }
+
+        .logo-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            /* إزاحة الهوامش ليصار خط "IRAQI GRAIN SYSTEM" في صفحة منفصلة */
+            .header-text {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+
+        .iraqi-grain-logo {
+            /* حجم أكبر وواضح للقراءة */
+            width: 160px; 
+            height: 160px;
+            
+            /* إطار أقوى وواضح */
+            border: 5px solid #fbc02d; 
+            
+            /* دائري */
+            border-radius: 50%;
+            background: #ffffff; /* خلفية بيضاء للشعار فقط */
+            
+            /* خلفية كاملة للشعار ليظهر منفصلاً */
+            object-fit: cover; 
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15); /* ظل بسيط للشعار */
+            
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            
+            /* التأكد من وجود الصورة - إخفاء العنوان الرئيسي إذا لم يوجد ملف */
+            background-image: url('iraqi-grain-logo.png') center / 100% no-repeat;
+            
+            /* 1. الخط أصبح حجم 18 بدلاً */
+            font-size: 18px; 
+            font-weight: 800; /* خط عريان ليزداد القراءة */
+            /* 2. لون أزرق واضح للقراءة على الخلفية البيضاء */
+            color: #003366; 
+            
+            /* إخفاء الدائرة المكرر التي قد تظهر من المكتبة */
+            background-color: transparent;
+            box-shadow: none; 
+        }
+
+        /* إخفاء الشعار عند الطباعة (فقطعة) */
+        @media print {
+            .main-header { display: none !important; }
+            body { background: white; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- الشعار والهيدر الرئيسي (مكرر في جميع الصفحات) -->
+    <div class="main-header">
+        <div class="logo-wrapper">
+            <!-- اسم الملف: iraqi-grain-logo.png -->
+            <div class="iraqi-grain-logo">
+                <!-- أيقونة درع وشعار القمحافظة -->
+                <div><i class="fas fa-shield-alt" style="font-size: 24px;"></i></div>
+                <div>
+                <div class="header-text">
+                    <!-- لون زرقاء لإبراز الظهور -->
+                    <div style="font-size: 16px; font-weight: bold; color: #003366;">IRAQI GRAIN</div>
+                    <div>
+                    <div style="font-size: 14px; color: #003366;">SYSTEM 1939</div>
+                </div>
+            </div>
+    </div>
+
+    <!-- محتوى الصفحة (Admin) -->
+    <div class="login-screen" id="loginSection">
+        <div class="login-box">
+            <h2><i class="fas fa-user-shield"></i> دخول المسؤول</h2>
+            <p>تسجيل الدخول لإدارة الفروع</p>
+            <br>
+            <input type="text" id="adminUser" placeholder="اسم المستخدم (admin)">
+            <input type="password" id="adminPass" placeholder="كلمة المرور">
+            <button class="btn" style="background:var(--primary-color); width:100%;" onclick="checkLogin()">دخول</button>
+            <p id="loginMsg" style="color:red; font-size:12px; text-align: center;"></p>
+        </div>
+
+    <div class="dashboard-container" id="dashboardContent" style="display:none;">
+        <div class="header">
+            <div>
+                <span style="font-size: 18px; font-weight: bold; color: #333;">إدارة الفروع</span>
+                <a href="index.html" class="btn" style="background:#666;">العودة للحجز</a>
+            </div>
+        <div>
+
+        <!-- قسم العرض -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('bookings')">عرض الحجوزات</button>
+            <button class="tab-btn" onclick="showTab('sites')">إعدادات المواقع</button>
+            <button class="tab-btn" onclick="showTab('branch')">إعدادات الشعبة والسيارات</button>
+        </div>
+
+        <!-- قسم العرض -->
+        <div id="bookingsTab">
+            <div class="filters">
+                <div class="filter-group"><label>من تاريخ</label><input type="date" id="filterStartDate"></div>
+                <div class="filter-group"><label>إلى تاريخ</label><input type="date" id="filterEndDate"></div>
+                <div class="filter-group"><label>المحافظة</label>
+                    <select id="filterGovernerate">
+                        <option value="">كل المحافظات</option>
+                        <option value="بغداد">بغداد</option>
+                        <option value="البصرة">البصرة</option>
+                        <option value="نينوى">نينوى</option>
+                        <option value="أربيل">أربيل</option>
+                        <option value="الأنبار">الأنبار</option>
+                        <option value="بابل">بابل</option>
+                        <option value="ذي قار">ذي قار</option>
+                        <option value="القادسية">القادسية</option>
+                        <option value="ديالى">ديالى</option>
+                        <option value="واسط">واسط</option>
+                        <option value="المثنى">المثنى</option>
+                        <option value="بابل">بابل</option>
+                        <option value="النجف">النجف</option>
+                        <option value="ميسان">ميسان</option>
+                        <option value="العمارة">العمارة</option>
+                        <option value="واسط">واسط</option>
+                        <option value="كربلاء">كربلاء</option>
+                        <option value="السليمانية">السليمانية</option>
+                        <option value="الديوانية">الديوانية</option>
+                        <option value="ميسان">ميسان</option>
+                        <option value="بغداد">بغداد</option>
+                    </select>
+                </div>
+                <div class="filter-group"><label>الموقع</label><select id="filterSite"><option value="">الكل المواقع</option></select></div>
+                <div class="filter-group"><label>نوع السيارة</label><select id="filterCarType"><option value="">الكل الأنواع</option></select></div>
+                <div class="filter-group"><label>اسم المسوق</label><input type="text" id="filterName" placeholder="بحث باسم المسوق..."></div>
+                <div class="filter-group" style="display:flex; align-items:flex-end; gap:10px;">
+                    <button class="btn" style="background:var(--primary-color); width:100%;" onclick="fetchBookings()">بحث</button>
+                </div>
+            </div>
+
+            <div class="actions-row">
+                <button class="btn btn-print" onclick="window.print()"><i class="fas fa-print"></i> طباعة</button>
+                <button class="btn btn-pdf" onclick="downloadTablePDF()"><i class="fas fa-file-pdf"></i> PDF</button>
+                <button class="btn btn-export" onclick="exportToCSV()"><i class="fas fa-file-excel"></i> Excel</button>
+            </div>
+
+            <div class="table-responsive" id="printableArea">
+                <table>
+                    <thead><tr><th>رقم الحجز</th><th>المحافظة</th><th>الموقع</th><th>التاريخ</th><th>المسوق</th><th>رقم الكتاب</th><th>تاريخ الكتاب</th><th>السيارة</th><th>نوع السيارة</th><th>السائق</th></tr></thead>
+                    <tbody id="bookingsBody"><tr><td colspan="12" style="text-align:center;">حدد التواريخ واضغط بحث</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- قسم المواقع -->
+        <div id="sitesTab" class="settings-section">
+            <div class="add-site-box" style="display:flex; gap:10px; align-items:flex-end; background:#e3f2fd; padding:20px; border-radius: 8px;">
+                <div style="flex:1;"><label>إضافة موقع جديد (للمحافظة المحددة في الأعلى)</label><input type="text" id="newSiteName" placeholder="اسم الموقع" style="width:100%; padding:10px;">
+                <button class="btn btn-add" onclick="addNewSite()"><i class="fas fa-plus"></i> إضافة</button>
+            </div>
+            <div class="site-cards-grid" id="sitesContainer"></div>
+        </div>
+
+        <!-- قسم الشعبة -->
+        <div id="branchTab" class="settings-section">
+            <h2>إعدادات الشعبة (المواقع والسيارات)</h2>
+            <div class="form-grid">
+                <div class="site-field">
+                    <label>اسم الشركة</label>
+                    <input type="text" id="branchCompanyName" placeholder="مثال: الشركة العامة لتجارة الحبوب">
+                </div>
+                <div class="site-field">
+                    <label>اسم الفرع</label>
+                    <input type="text" id="branchName" placeholder="مثال: فرع بغداد">
+                </div>
+                <div class="site-field full-width">
+                    <label>عنوان الفرع</label>
+                    <input type="text" id="branchAddress" placeholder="مثال: بغداد، الرصافة">
+                </div>
+                <div class="site-field full-width">
+                    <label>أنواع السيارات المتاحة</label>
+                    <div id="carTypesContainer" class="car-types-list"></div>
+                    <div class="add-type-box">
+                        <input type="text" id="newCarTypeInput" placeholder="اسم النوع الجديد" style="flex:2; padding:8px;">
+                        <button class="btn" style="background:var(--primary-color);" onclick="addCarType()"><i class="fas fa-plus"></i> إضافة</button>
+                    </div>
+                </div>
+                <button class="btn-save" style="background:var(--success-color); width:100%; font-size: 18px; padding:15px;" onclick="saveBranchSettings()">
+                    <i class="fas fa-save"></i> حفظ إعدادات الفرع
+                </button>
+        </div>
+    </div>
+
+    <script>
+        // إعدادات Firebase الجديدة (wheatmarketingsystem)
+        const firebaseConfig = {
+            apiKey: "AIzaSyANWvhLPij3mGv8apl2T_XnGA9EgEQaeNY",
+            authDomain: "wheatmarketingsystem.firebaseapp.com",
+            databaseURL: "https://wheatmarketingsystem-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "wheatmarketingsystem",
+            storageBucket: "wheatmarketingsystem.firebasestorage.app",
+            messagingSenderId: "334676226552",
+            appId: "1:334676226552:web:2304c9a4b354370b90a60d"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // 1. تسجيل دخول المدير العام
+        async function loginAdmin() {
+            const user = document.getElementById('adminUser').value;
+            const pass = document.getElementById('adminPass').value;
+            const msg = document.getElementById('loginMsg');
+            
+            const adminSnap = await db.ref('admin_credentials').once('value');
+            const adminData = adminSnap.val();
+            
+            if ((user === "admin" && pass === "admin") || (adminData && user === adminData.user && pass === adminData.pass)) {
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('dashboardContent').style.display = 'block';
+                loadSites();
+            } else {
+                msg.textContent = "بيانات الدخول غير صحيحة";
+            }
+        }
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.settings-section, #bookingsTab').forEach(p => {
+                if(p.id !== 'bookingsTab') p.style.display = 'none';
+                else if(tabName === 'bookings') p.style.display = 'block';
+            });
+            if(tabName === 'sites') document.getElementById('sitesTab').style.display = 'block';
+            if(tabName === 'branch') document.getElementById('branchTab').style.display = 'block';
+            event.target.classList.add('active');
+        }
+
+        // 2. إدارة المواقع (محافظات)
+        async function addNewSite() {
+            const gov = document.getElementById('governorateSelect').value;
+            const name = document.getElementById('newSiteName').value.trim();
+            if(!name) return alert("يرجى اختيار المحافظة واسم الموقع");
+            const defaults = { maxLimit: 100, startDate: "2026-05-01", endDate: "status": "نشط" };
+            
+            await db.ref(`sites/${name}`).set(defaults);
+            document.getElementById('newSiteName').value = '';
+            loadSites();
+            fetchSitesForFilter();
+        }
+
+        function loadSites() {
+            const container = document.getElementById('sitesContainer');
+            container.innerHTML = '<p style="text-align:center;">جاري تحميل المواقع...</p>';
+            db.ref('sites').on('value', snapshot => {
+                container.innerHTML = '';
+                const sites = snapshot.val();
+                if(!sites) { container.innerHTML = '<p style="text-align:center;">لا توجد مواقع مضافة</p>'; return; }
+                Object.keys(sites).forEach(siteName => {
+                    const config = sites[siteName];
+                    const card = document.createElement('div');
+                    card.className = 'site-card';
+                    card.innerHTML = `
+                        <i class="fas fa-trash btn-delete-site" onclick="deleteSite('${siteName}')" title="حذف الموقع"></i>
+                        <h4>${siteName}</h4>
+                        <div class="site-field"><label>السعة القصوى (يومي)</label><input type="number" id="limit-${siteName.replace(/\s/g, '')}" value="${config.maxLimit || 100}"></div>
+                        <div class="site-field"><label>تاريخ البداية</label><input type="date" id="start-${siteName.replace(/\s/g, '')}" value="${config.startDate || ''}"></div>
+                        <div class="site-field"><label>تاريخ النهاية</label><input type="date" id="end-${siteName.replace(/\s/g, '')}" value="${config.endDate || ''}"></div>
+                        <button class="btn-save-site" style="background:var(--success-color); color:white; border:none; border-radius: 4px; padding:10px; width:100%; margin-top:10px;" onclick="updateSiteSettings('${siteName}')">حفظ</button>
+                    `;
+                    container.appendChild(card);
+                });
+            });
+        }
+
+        function updateSiteSettings(siteName) {
+            const cleanName = siteName.replace(/\s/g, '');
+            const newLimit = document.getElementById(`limit-${cleanName}`).value;
+            const newStart = document.getElementById(`start-${cleanName}`).value;
+            const newEnd = document.getElementById(`end-${cleanName}`).value;
+            
+            if(!newStart || !newEnd) { alert("يرجى تحديد التواريخ"); return; }
+            await db.ref(`sites/${siteName}`).update({ maxLimit: Number(newLimit), startDate: newStart, endDate: newEnd });
+            alert("تم تحديث إعدادات الموقع");
+        }
+
+        function deleteSite(siteName) {
+            if(confirm(`هل أنت متأكد من حذف الموقع "${siteName}"؟`)) await db.ref(`sites/${siteName}`).remove();
+        }
+
+        // 3. إعدادات المحافظة (الشعار والسيارات)
+        function loadBranchSettings() {
+            db.ref('branchSettings').once('value').then(snapshot => {
+                if(snapshot.exists()) {
+                    const info = snapshot.val();
+                    document.getElementById('branchCompanyName').value = info.companyName || '';
+                    document.getElementById('branchName').value = info.branchName || '';
+                    document.getElementById('branchAddress').value = info.address || '';
+                    if(info.carTypes) renderCarTypes(info.carTypes);
+                }
+            });
+        }
+
+        function renderCarTypes(types) {
+            const container = document.getElementById('carTypesContainer');
+            container.innerHTML = '';
+            types.forEach((type, index) => {
+                const div = document.createElement('div');
+                div.className = 'car-type-item';
+                div.innerHTML = `
+                    <span>${type}</span>
+                    <i class="fas fa-times btn-remove-type" onclick="removeCarType(${index})"></i>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function addCarType() {
+            const input = document.getElementById('newCarTypeInput');
+            const val = input.value.trim();
+            if(!val) return;
+            const container = document.getElementById('carTypesContainer');
+            const div = document.createElement('div');
+            div.className = 'car-type-item';
+            div.innerHTML = `<span>${val}</span> <small>(سيتم الحفظ عند الضغط على حفظ)</small>`;
+            container.appendChild(div);
+            input.value = '';
+        }
+
+        function removeCarType(index) {
+            const items = document.querySelectorAll('.car-type-item');
+            if(items[index]) items[index].remove();
+        }
+
+        async function saveBranchSettings() {
+            const companyName = document.getElementById('branchCompanyName').value;
+            const branchName = document.getElementById('branchName').value;
+            const address = document.getElementById('branchAddress').value;
+            
+            // جمع أنواع السيارات من الـ DOM
+            const typeItems = document.querySelectorAll('#carTypesContainer span');
+            const carTypes = [];
+            typeItems.forEach(span => {
+                if(span.innerText && !span.innerText.includes('(سيتم الحفظ')) {
+                    carTypes.push(span.innerText);
+                }
+            });
+
+            if(!companyName || !branchName) return alert("يرجى إدخال اسم الشركة والمحافظة");
+            
+            // تحديث المسار `branchSettings`
+            await db.ref('branchSettings').set({
+                companyName, branchName, address, carTypes
+            });
+            alert("تم حفظ إعدادات المحافظة والسيارات");
+        }
+
+        // الفلاتر
+        function fetchSitesForFilter() {
+            const select = document.getElementById('filterSite');
+            select.innerHTML = '<option value="">الكل</option>';
+            db.ref('sites').once('value', snap => {
+                const sites = snap.val();
+                if(sites) {
+                    Object.keys(sites).forEach(name => {
+                        const opt = document.createElement('option');
+                        opt.value = name; opt.textContent = name;
+                        select.appendChild(opt);
+                    });
+                }
+            });
+        }
+
+        function fetchCarTypesForFilter() {
+            const select = document.getElementById('filterCarType');
+            select.innerHTML = '<option value="">الكل الأنواع</option>';
+            db.ref('branchSettings/carTypes').once('value', snap => {
+                const types = snap.val();
+                if(types) {
+                    types.forEach(type => {
+                        const opt = document.createElement('option');
+                        opt.value = type; opt.textContent = type;
+                        select.appendChild(opt);
+                    });
+                }
+            });
+        }
+
+        // جلب البيانات
+        async function fetchBookings() {
+            const startDate = document.getElementById('filterStartDate').value;
+            const endDate = document.getElementById('filterEndDate').value;
+            const siteFilter = document.getElementById('filterSite').value;
+            const carTypeFilter = document.getElementById('filterCarType').value;
+            const nameFilter = document.getElementById('filterName').value.toLowerCase();
+            const tbody = document.getElementById('bookingsBody');
+
+            if (!startDate) { alert("يرجى اختيار 'من تاريخ' على الأقل"); return; }
+            tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;">جاري التحميل...</td></tr>';
+            let allBookings = [];
+
+            try {
+                let ref = db.ref('sites');
+                if (siteFilter) {
+                    ref = db.ref(`sites/${siteFilter}`);
+                }
+
+                if (startDate && endDate) {
+                    ref = ref.orderByKey().startAt(startDate).endAt(endDate);
+                    const snapshot = await ref.once('value');
+                    if (snapshot.exists()) {
+                        snapshot.forEach(dateSnapshot => {
+                            const dateKey = dateSnapshot.key;
+                            dateSnapshot.forEach(bookingSnapshot => {
+                                let data = bookingSnapshot.val();
+                                data.date = dateKey;
+                                data.site = siteFilter; // استخدام اسم الموقع من الفلتر
+                                allBookings.push(data);
+                            });
+                        });
+                    }
+                } else {
+                    const snapshot = await ref.child(startDate).once('value');
+                    if (snapshot.exists()) {
+                        snapshot.forEach(childSnapshot => {
+                            let data = childSnapshot.val();
+                            data.date = startDate;
+                            data.site = siteFilter;
+                            allBookings.push(data);
+                        });
+                    }
+                }
+                tbody.innerHTML = '';
+                if (allBookings.length === 0) { tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;">لا توجد بيانات</td></tr>'; return; }
+                
+                allBookings.sort((a,b) => { if (a.date !== b.date) return a.date.localeCompare(b.date); return a.bookingId - b.bookingId; });
+
+                let hasData = false;
+                allBookings.forEach(booking => {
+                    // فلتر نوع السيارة
+                    if (carTypeFilter && booking.carType !== carTypeFilter) return;
+                    // فلتر اسم المسوق
+                    if (nameFilter && (!booking.marketer || !booking.marketer.toLowerCase().includes(nameFilter))) return;
+
+                    hasData = true;
+                    const formattedBookDate = booking.bookDate ? booking.bookDate.replace(/-/g, '/') : '-';
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><b>${booking.bookingId}</b></td><td>${booking.site}</td><td>${booking.date}</td><td>${booking.marketer || '-'}</td><td>${booking.agBook}</td><td>${formattedBookDate}</td><td>${booking.carNum || '-'}</td><td>${booking.carType || '-'}</td><td>${booking.driver || '-'}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                if (!hasData) tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;">لا توجد نتائج تطابق الفلاتر</td></tr>';
+
+            } catch (error) { tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;">خطأ</td></tr>'; }
+        }
+
+        function downloadTablePDF() {
+            const element = document.getElementById('printableArea');
+            const opt = { margin: 0.5, filename: `تقرير_${new Date().toISOString().split('T')[0]}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' } };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        function exportToCSV() {
+            let csv = [], rows = document.querySelectorAll("#bookingsBody tr");
+            for (let i = 0; i < rows.length; i++) {
+                let row = [], cols = rows[i].querySelectorAll("td");
+                for (let j = 0; j < cols.length; j++) 
+                    row.push('"' + cols[j].innerText + '"');
+                csv.push(row.join(","));
+            }
+            let csvFile = new Blob(["\ufeff"+csv.join("\n")], {type: "text/csv;charset=utf-8;"});
+            let downloadLink = document.createElement("a");
+            downloadLink.download = "bookings.csv";
+            downloadLink.href = window.URL.createObjectURL(csvFile);
+            downloadLink.click();
+        }
+    </script>
+</body>
+</html>
