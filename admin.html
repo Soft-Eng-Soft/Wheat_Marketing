@@ -3,145 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الإدارة العامة - شركة التسويق</title>
+    <title>الإدارة العامة</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <!-- مكتبة الأيقونات -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { 
-            --primary-color: #1a3c9e; /* لون المحافظة (أخضر داكن) */
-            --wheat-color: #fbc02d; /* لون المحافظة */
-            --text-color: #333; 
-            --error-color: #d32f2f; 
-            --disabled-color: #bdbdbd; 
-            --header-bg: #003366; /* لون خلفية الهيئة العامة */
-            --white: #fff; 
-            --bg-color: #f4f6f8;
-        }
+        :root { --primary-color: #2e7d32; --text-color: #333; --error-color: #d32f2f; --bg-color: #f4f6f8; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-color); padding: 20px; }
 
-        /* تصميم الشعار */
+        /* تنسيق الهيدر */
         .main-header {
-            background-color: var(--header-bg);
+            background-color: var(--header-bg); /* لون هندر الإدارة العامة */
             color: var(--white);
             padding: 20px;
             text-align: center;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.2);
-            border-bottom: 4px solid var(--wheat-color); /* إطار ذهبي للشعار */
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            border-bottom: 4px solid var(--wheat-color);
             margin-bottom: 20px;
         }
 
         .logo-wrapper {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
+            justify-content: center;
+            gap: 15px;
         }
 
         .iraqi-grain-logo {
-            background: var(--primary-color); /* لون المحافظة */
-            color: var(--white);
-            border: 3px solid var(--wheat-color);
+            /* تصميم الشعار */
+            width: 100px; /* حجم مناسب للإدارة */
+            height: 100px;
+            object-fit: cover;
+            border: 3px solid var(--wheat-color); /* إطار زهبي */
             border-radius: 50%;
-            width: 100px;
-            height: 50px;
+            background: #ffffff; /* خلفية بيضاء لضمان ظهور الشعار */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            /* إزالة النص الافتراضي للحفاظة الشعار */
+            color: transparent; 
             display: flex;
             flex-direction: column;
+            justify-content: center;
             align-items: center;
-            font-weight: 900;
-            font-size: 14px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .iraqi-grain-logo * { pointer-events: none; }
+
+        /* النصوص الهيدر */
+        .system-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #000; /* نص أسود عريان لضمان القراءة */
+            margin-top: 10px;
+            text-shadow: 0 1px 0 rgba(0,0,0,0.1); 
         }
 
-        /* تصميم النموذج */
-        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        /* التنسيق الأنموذج */
+        .container { 
+            max-width: 1000px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05); 
+            display: none; /* إخفاء المحتوى في البداية */
+        }
+
         .login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-        .login-box { max-width: 400px; margin: 50px auto; text-align: center; padding: 30px; border: 1px solid #ddd; border-radius: 8px; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
-        button { padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; background: var(--primary-color); color: white; font-weight: bold; }
+        .login-box { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); text-align: center; width: 350px; border-top: 5px solid var(--primary-color); }
+        .login-box input { width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 5px; text-align: center; }
+        .btn { padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; background: var(--primary-color); color: white; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 5px; }
         .btn-danger { background: var(--danger-color); }
-        .branch-card { border: 1px solid #eee; padding: 15px; margin-bottom: 10px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* إعدادات الفروع */
+        .branches-list { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        .branch-item { border: 1px solid #ddd; padding: 20px; border-radius: 8px; background: white; text-align: center; }
+        .branch-item h3 { color: var(--primary-color); margin-bottom: 10px; font-size: 20px; }
+        .branch-item small { color: #666; font-size: 14px; }
 
-        .branches-list { display: grid; grid-template-columns: 1fr; gap: 15px; }
-        .branches-list-item {
-            border: 1px solid #eee;
-            padding: 15px;
-            border-radius: 8px;
-            background: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .branches-info h3 { color: var(--primary-color); margin-bottom: 5px; font-size: 18px; }
+        /* إعدادات النظام */
+        .settings-section { display: none; background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ddd; }
+        .settings-section.active { display: block; }
+        .full-width { grid-column: span 2; }
+        .form-group { margin-bottom: 10px; }
+        .form-group label { display: block; font-weight: 600; font-size: 14px; color: #444; }
+        .form-group input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; }
 
-        /* تصميم الجدول */
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab-btn { padding: 10px 20px; border: none; background: #eee; cursor: pointer; border-radius: 5px; font-weight: bold; }
-        .tab-btn.active { background: var(--primary-color); color: white; }
-
-        .filters { display: flex; flex-wrap: wrap; gap: 15px; background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ddd; }
-        .filter-group { flex: 1; min-width: 150px; }
+        /* الجدول */
+        .filters { display: flex; flex-wrap: wrap; gap: 10px; background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ddd; }
+        .filter-group { flex: 1; min-width: 140px; }
         .filter-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px; }
-        .filter-group input, .filter-group select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        .filter-group select { background: white; }
+        .filter-group input, .filter-group select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
 
         table { width: 100%; border-collapse: collapse; font-size: 14px; }
         th, td { padding: 10px; text-align: right; border-bottom: 1px solid #ddd; }
         th { background: var(--primary-color); color: white; white-space: nowrap; }
         tr:hover { background: #e3f2fd; }
 
-        .actions-row { display: flex; gap: 10px; justify-content: flex-end; margin-bottom: 20px; }
-        .btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; color: white; font-weight: bold; display: inline-flex; align-items: center; gap: 5px; font-size: 13px; }
+        .actions-row { display: flex; gap: 10px; justify-content: flex-end; margin-bottom: 10px; }
         .btn-print { background: #333; }
         .btn-pdf { background: #d32f2f; }
-        .btn-export { background: var(--wheat-color); }
-        .btn-add { background: var(--primary-color); }
+        .btn-export { background: var(--export-color); }
 
-        @media print {
-            .main-header { display: none !important; }
-            .dashboard-container { box-shadow: none; width: 100%; margin: 0; padding: 0; }
-            body { background: white; padding: 0; }
-        }
+       
     </style>
 </head>
 <body>
 
-    <!-- شعار الهيئة العامة -->
+    <!-- الهيدر (الشعار) -->
     <div class="main-header">
         <div class="logo-wrapper">
             <!-- اسم الملف: iraqi-grain-logo.png -->
-            <img src="iraqi-grain-logo.png" class="iraqi-grain-logo" alt="Shield & Wheat System">
+            <!-- إزالة أي نص خلف في الشعار لجعله أنيقا -->
+            <img src="iraqi-grain-logo.png" class="iraqi-grain-logo">
+            <div class="system-title">نظام إدارة الحجوزات<br><span style="font-size: 16px; font-weight: normal;">الهيئة العامة لتجارة الحبوب</span></div>
         </div>
-        <div>
-            <div style="font-size: 20px; font-weight: 800; color: var(--text-color);">نظام إدارة الحجوزات</div>
-            <span style="font-size: 16px; color: var(--wheat-color);">الهيئة العامة لتجارة الحبوب</span>
-        </div>
-    </div>
 
-    <!-- قسم تسجيل الدخول -->
-    <div class="login-screen" id="loginScreen">
+    <!-- تسجيل الدخول -->
+    <div class="login-screen" id="loginSection">
         <div class="login-box">
             <h2><i class="fas fa-user-shield"></i> الإدارة العامة</h2>
             <p>تسجيل الدخول لإدارة الفروع</p>
-            <br>
-            <!-- تمت إضافة id="adminUser" -->
-            <input type="text" id="adminUser" placeholder="اسم المستخدم (admin)">
-            <input type="password" id="adminPass" placeholder="كلمة المرور (admin)">
-            <button class="btn" style="width:100%;" onclick="loginAdmin()">دخول</button>
-            <p id="loginMsg" style="color:red; font-size: 12px; text-align: center;"></p>
+            <input type="text" id="adminUser" placeholder="اسم المستخدم ">
+            <input type="password" id="adminPass" placeholder="كلمة المرور">
+            <button class="btn" style="background:var(--primary-color); width:100%;" onclick="loginAdmin()">دخول</button>
+            <p id="loginMsg" style="color:red; text-align: center; font-size: 12px;"></p>
         </div>
 
     <!-- لوحة الإدارة -->
-    <div class="dashboard-container" id="dashboardContent" style="display:none;">
-        <div class="branches-list" id="branchesContainer">
-            <p style="text-align: center; font-size: 16px; color: #666;">جاري تحميل الفروع...</p>
+    <div class="container" id="dashboardContent">
+        <div class="header">
+            <span style="font-size: 18px; font-weight: bold; color: #333;">إدارة الفروع</span>
+            <a href="index.html" class="btn" style="background:#666;">العودة للحجز</a>
         </div>
 
+        <div id="branchesList">
+            <p style="text-align: center;">جاري تحميل الفروع...</p>
+        </div>
+</div>
+
     <script>
-        // إعدادات Firebase الجديدة (wheatmarketingsystem)
+        // إعدادات Firebase (wheatmarketingsystem)
         const firebaseConfig = {
             apiKey: "AIzaSyANWvhLPij3mGv8apl2T_XnGA9EgEQaeNY",
             authDomain: "wheatmarketingsystem.firebaseapp.com",
@@ -154,9 +154,8 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 1. تسجيل الدخول المدير العام
+        // دالة تسجيل دخول المدير العام
         async function loginAdmin() {
-            // إصلاح الحقول بواسطة ID
             const user = document.getElementById('adminUser').value;
             const pass = document.getElementById('adminPass').value;
             const msg = document.getElementById('loginMsg');
@@ -164,82 +163,46 @@
             const adminSnap = await db.ref('admin_credentials').once('value');
             const adminData = adminSnap.val();
             
-            // التحقق من قاعدة البيانات أو الافتراضي (admin/admin)
             if ((user === "admin" && pass === "admin") || (adminData && user === adminData.user && pass === adminData.pass)) {
-                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('loginSection').style.display = 'none';
                 document.getElementById('dashboardContent').style.display = 'block';
-                loadSites();
+                loadBranches();
             } else {
                 msg.textContent = "بيانات الدخول غير صحيحة";
             }
         }
 
-        // إضافة فرع جديد (نفس المنطق السابق)
-        async function addNewSite() {
-            const gov = document.getElementById('governorateSelect').value;
-            const name = document.getElementById('branchNameInput').value;
-            const user = document.getElementById('branchUserInput').value;
-            const pass = document.getElementById('branchPassInput').value;
-
-            if(!gov || !name || !user || !pass) return alert("يرجى ملء جميع البيانات");
-
-            // استخدام اسم المستخدم كمعرف بسيط للفرع
-            const branchId = user.replace(/\s/g, '_').toLowerCase();
-
-            await db.ref(`branches/${branchId}`).set({
-                governorate: gov,
-                branchName: name,
-                username: user,
-                password: pass,
-                info: {
-                    companyName: "الهيئة العامة لتجارة الحبوب",
-                    address: "",
-                    carTypes: ["شاحنة صغيرة", "شاحنة متوسطة", "شاحنة كبيرة", "تريلا", "تريلا - قاطرة ومقطورة", "قلاب سكس", "قلاب تك", "نساف", "كيا حمل"]
-                }
-            });
-
-            alert("تمت إضافة الفرع بنجاح");
-            document.getElementById('branchNameInput').value = '';
-            document.getElementById('branchUserInput').value = '';
-            document.getElementById('branchPassInput').value = '';
-            loadBranches();
-        }
-
-        // عرض الفروع
+        // دالة جلب الفروع
         function loadBranches() {
             const list = document.getElementById('branchesList');
-            db.ref('branches').on('value', snap => {
+            list.innerHTML = '<p style="text-align:center;">جاري تحميل الفروع...</p>';
+            
+            db.ref('branches').on('value', snapshot => {
                 list.innerHTML = '';
-                const branches = snap.val();
-                if(!branches) { list.innerHTML = '<p style="text-align:center;">لا توجد فروع مضافة.</p>'; return; }
-                
+                const branches = snapshot.val();
+                if(!branches) { list.innerHTML = '<p style="text-align:center;">لا توجد فروع.</p>'; return; }
+
                 Object.keys(branches).forEach(key => {
                     const b = branches[key];
                     const div = document.createElement('div');
-                    div.className = 'branches-list-item';
+                    div.className = 'branch-item';
+                    // استخدام فاصلة الشعار والنصوصف من كلاس CSS (مهم جداً بخصوص في الطباعة)
                     div.innerHTML = `
-                        <div class="branches-info">
-                            <h3>${b.branchName}</h3>
-                            <small>${b.governorate} - مستخدم: ${b.username}</small>
-                        </div>
-                        <div>
-                            <button class="btn" style="background:var(--primary-color);" onclick="openBranchDashboard('${key}')">لوحة الفرع</button>
-                            <button class="btn btn-danger" onclick="deleteBranch('${key}', '${b.branchName}')"><i class="fas fa-trash"></i> حذف</button>
-                        </div>
+                        <i class="fas fa-trash" style="position:absolute; top:10px; left: 10px; color: #999; cursor: pointer; font-size: 18px;" onclick="deleteBranch('${key}')" title="حذف الفرع"></i>
+                        <h3>${b.branchName}</h3>
+                        <small>${b.governorate} - المستخدم: ${b.username}</small>
                     `;
                     list.appendChild(div);
                 });
             });
         }
 
-        function deleteBranch(id, name) {
-            if(confirm(`هل أنت متأكد من حذف فرع ${name}؟ سيتم فقدان جميع بيانات الحجوزات والمواقع التابعة له.`)) {
-                db.ref(`branches/${id}`).remove();
+        // دالة حذف الفرع
+        async function deleteBranch(id) {
+            if(confirm(`هل أنت متأكد من حذف الفرع "${id}"؟ سيتم فقدان جميع بيانات الحجوزات والمواقع التابعة له.`)) {
+                await db.ref('branches/'+id).remove();
+                loadBranches();
             }
-        }
-
-        function openBranchDashboard(id) {
-            window.location.href = `dashboard.html?branch=${id}`;
         }
     </script>
 </body>
