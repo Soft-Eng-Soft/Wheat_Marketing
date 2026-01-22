@@ -10,21 +10,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root {
-            --primary-color: #2e7d32;
-            --accent-color: #d32f2f;
-            --text-color: #333;
-            --disabled-color: #bdbdbd;
-            --header-bg: #003366;
-            --wheat-color: #fbc02d;
-            --bg-color: #f1f8f9;
-            --radius: 8px;
-            --shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
+        :root { --primary-color: #2e7d32; --text-color: #333; --error-color: #d32f2f; --disabled-color: #bdbdbd; --shadow: 0 4px 6px rgba(0,0,0,0.1); --radius: 8px; --header-bg: #003366; --wheat-color: #fbc02d; --bg-color: #e8f5e9; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-color); padding: 20px; }
 
-        /* الهيدر (الشعار والعنوانين) */
+        /* الهيدر (الشعار والعنوان) */
         .main-header {
             background-color: var(--header-bg);
             color: var(--white);
@@ -33,55 +23,52 @@
             flex-direction: column;
             align-items: center;
             gap: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             border-bottom: 4px solid var(--wheat-color);
             margin-bottom: 20px;
         }
 
         .logo-wrapper {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
             gap: 15px;
             display: none; /* مخفي في البداية */
-            align-items: center; /* توزيع أفقي */
         }
 
         .iraqi-grain-logo {
-            width: 120px;
-            height: 120px;
+            width: 140px; height: 140px;
             object-fit: cover;
             border: 3px solid var(--wheat-color);
             border-radius: 50%;
             background: #ffffff;
             box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            color: transparent;
+            color: transparent; /* لمنع ظهور نص خلف الصورة */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            text-align: center;
+            font-size: 30px; /* حجم نص كبير للداخل الصورة */
+            font-weight: 800;
+            color: #003366;
+            text-shadow: 0 1px 0 rgba(0,0,0,0.1); 
         }
 
         .system-title {
-            font-size: 26px; font-weight: 900; /* خط عريان جداً */
+            font-size: 26px;
+            font-weight: 900;
             color: var(--text-color);
             text-align: center;
             margin-top: 10px;
             text-shadow: 0 1px 2px rgba(0,0,0,0.2); 
         }
 
-        .system-subtitle {
-            font-size: 18px; font-weight: bold;
-            color: var(--header-bg); /* لون زرقاء داكن */
-            text-align: center;
-            margin-top: 5px;
-        }
-
         /* قسم اختيار الفرع */
         .branch-selector-container {
             background: white;
             border: 2px solid #ddd;
-            border-top: 5px solid var(--wheat-color); /* إطار ذهبي */
+            border-top: 5px solid var(--wheat-color);
             padding: 20px;
             border-radius: 8px;
             width: 90%;
@@ -89,10 +76,18 @@
             text-align: center;
             display: none; /* مخفي في البداية */
             align-items: center;
-            flex-direction: column;
         }
 
-        /* المحتوى (النموذج) */
+        .branch-logo {
+            width: 100px;
+            height: 100px;
+            border: 2px solid var(--wheat-color);
+            border-radius: 50%;
+            object-fit: cover;
+            display: none; /* مخفي في البداية */
+        }
+
+        /* محتوى الصفحة (النموذج) */
         .container {
             background: white;
             width: 100%;
@@ -105,287 +100,86 @@
             display: none; /* مخفي في البداية */
         }
 
-        /* شعار الفرع */
-        .branch-logo {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border: 2px solid var(--wheat-color);
-            border-radius: 50%;
-            display: none; /* مخفي في البداية */
-            margin: 0 auto 10px auto;
-        }
-
-        /* العناوين */
-        .header-text {
+        /* عناوين الفرع (داخل النموذج) */
+        .branch-header {
             text-align: center;
-            margin-top: 20px;
+            margin-bottom: 10px;
             display: none; /* مخفي في البداية */
         }
 
         .header-title {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: bold;
-            color: var(--text-color);
+            color: var(--primary-color);
             text-align: center;
-            margin-bottom: 5px;
         }
+        h1 { color: var(--primary-color); margin-bottom: 5px; text-align: center; font-size: 24px; }
 
-        /* النموذج (الحقول) */
+        /* التنسيق المودال */
         .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: #444; }
-        input[type="text"], input[type="date"], select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: var(--radius);
-            font-size: 16px;
-            background: #fff; /* خلفية بيضاء للحقول */
-        }
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
-        }
-        .input-error {
-            border-color: var(--error-color) !important;
-            background-color: #fff8f8;
-            animation: shake 0.4s ease-in-out;
-        }
-        @keyframes shake {
-            0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 100% { transform: translateX(0); } 
-        }
+        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; }
+        input[type="text"], input[type="date"], select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: var(--radius); font-size: 16px; background: #fff; }
+        input:focus, select:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1); }
+        .input-error { border-color: var(--error-color) !important; background-color: #fff8f8; animation: shake 0.4s ease-in-out; }
+        @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 100% { transform: translateX(0); } }
 
-        .capacity-display {
-            font-size: 13px; margin-top: 5px; font-weight: bold; color: var(--primary-color);
-            background: #e8f5e9;
-            padding: 8px; border-radius: 4px;
-            display: flex; justify-content: space-between;
-        }
-        .capacity-display.full {
-            background: #ffebee; color: var(--error-color);
-        }
+        .capacity-display { font-size: 13px; margin-top: 5px; font-weight: bold; color: var(--primary-color); background: #e8f5e9; padding: 8px; border-radius: 4px; display: none; justify-content: space-between; }
+        .capacity-display.full { background: #ffebee; color: var(--error-color); }
 
-        .btn-submit {
-            width: 100%;
-            padding: 14px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: var(--radius);
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            justify-content: center; align-items: center;
-            gap: 10px;
-        }
-        .btn-submit:disabled {
-            background-color: var(--disabled-color);
-            cursor: not-allowed;
-        }
+        .btn-submit { width: 100%; padding: 14px; background-color: var(--primary-color); color: white; border: none; border-radius: var(--radius); font-size: 18px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .btn-submit:disabled { background-color: var(--disabled-color); cursor: not-allowed; }
 
-        /* المودال (وصل الحجز) */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            backdrop-filter: blur(3px);
-        }
+        /* وصل الحجز */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(3px); }
+        
+        .modal-content { 
+            background: white; padding: 40px; border-radius: var(--radius); width: 90%; max-width: 500px; text-align: center; color: black; border: 2px solid var(--primary-color); box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: none; }
+        
+        /* شعار الوصل */
+        .ticket-wrapper { text-align: center; margin-top: 10px; }
+        .modal-icon { width: 80px; height: 80px; background: #e8f5e9; color: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; margin: 0 auto 20px; border: 4px solid var(--primary-color); }
+        .ref-number { font-size: 48px; font-weight: 900; color: #d32f2f; margin: 10px 0 20px 0; display: block; border-bottom: 2px dashed #ccc; padding-bottom: 20px; border-top: 2px dashed #ccc; padding-top: 20px; letter-spacing: 2px; }
 
-        .modal-content {
-            background: white;
-            padding: 40px;
-            border: 2px solid var(--primary-color);
-            width: 90%;
-            max-width: 500px;
-            text-align: center;
-            color: black;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-        }
+        .booking-details { text-align: right; background: #fff; padding: 0; font-size: 18px; line-height: 1.8; }
+        .booking-details p { border-bottom: 1px solid #eee; padding: 5px 0; color: #444; }
+        .booking-details strong { color: var(--primary-color); margin-left: 10px; }
 
-        .ticket-wrapper {
-            text-align: center; margin-top: 10px;
-        }
-        .modal-icon {
-            width: 80px; height: 80px;
-            background: #e8f5e9;
-            color: var(--primary-color);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 40px;
-            margin: 0 auto 20px;
-            border: 4px solid var(--primary-color);
-        }
-        .ref-number {
-            font-size: 48px; font-weight: 900;
-            color: var(--error-color);
-            margin: 10px 0 20px 0;
-            display: block;
-            border-bottom: 2px dashed #ccc;
-            padding-bottom: 20px;
-            border-top: 2px dashed #ccc;
-            padding-top: 20px;
-            letter-spacing: 2px;
-        }
-
-        .booking-details {
-            text-align: right;
-            background: #fff;
-            padding: 0;
-            font-size: 18px;
-            line-height: 1.8;
-            display: none; /* مخفي في البداية، يظهر عند نجاح الحجز */
-        }
-        .booking-details p {
-            border-bottom: 1px solid #eee;
-            padding: 5px 0;
-            color: #444;
-        }
-        .booking-details strong {
-            color: var(--primary-color);
-            margin-left: 10px;
-        }
-
-        .modal-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-            display: none; /* مخفي في البداية */
-        }
-
-        .btn-modal {
-            width: 100%;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: var(--radius);
-            font-size: 16px;
-            cursor: pointer;
-            font-weight: bold;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-        }
+        .modal-actions { display: flex; flex-direction: column; gap: 15px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; display: none; }
+        .btn-modal { width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: var(--radius); font-size: 16px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn-save-pdf { background-color: #333; color: white; }
         .btn-save-image { background-color: var(--primary-color); color: white; }
         .btn-close { background-color: #eee; color: #555; font-weight: normal; }
-        .spinner {
-            border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top: 3px solid white;
-            width: 20px; height: 20px;
-            animation: spin 1s linear infinite;
-            display: none;
+        .spinner { border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top: 3px solid white; width: 20px; height: 20px; animation: spin 1s linear infinite; display: none; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); }}
+
+        /* تنسيق الطباعة */
+        @media print {
+            .main-header { display: none !important; } 
+            .modal-actions { display: none !important; } 
+
+            .modal-content { 
+                border: 2px solid #000; 
+                padding: 20px; 
+                width: 90%; margin: 0 auto; max-width: 500px;
+                box-shadow: none;
+            }
+            .booking-details { font-size: 22px; line-height: 1.8; }
+            .booking-details p { margin-bottom: 15px; border-bottom: 1px solid #000; color: #000; padding: 0; }
+            .booking-details strong { color: var(--primary-color); margin-left: 5px; }
+            
+            #modalBranchName { display: block; font-size: 22px; font-weight: bold; color: #000; margin: 20px 0; }
         }
-        
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-      
-    @media print {
-    /* إخفاء العناصر غير المرغوب فيها في الطباعة */
-    .main-header, 
-    .modal-actions, 
-    .btn-close, 
-    .btn-save-pdf, 
-    .btn-save-image,
-    .no-print {
-        display: none !important;
-    }
-    
-    /* تحسين ظهور المودال */
-    .modal-overlay {
-        display: block !important;
-        position: static !important;
-        background: none !important;
-        backdrop-filter: none !important;
-    }
-    
-    .modal-content {
-        display: block !important;
-        position: static !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        margin: 0 !important;
-        padding: 15px !important;
-        box-shadow: none !important;
-        border: 2px solid #000 !important;
-        page-break-inside: avoid !important;
-        break-inside: avoid !important;
-    }
-    
-    /* تحسين التفاصيل لظهور أوضح */
-    .booking-details {
-        display: block !important;
-        width: 100% !important;
-        margin: 20px 0 !important;
-        padding: 15px !important;
-        background: #fff !important;
-        border: 1px solid #ddd !important;
-        page-break-inside: avoid !important;
-    }
-    
-    /* تحسين الفقرات */
-    .booking-details p {
-        display: block !important;
-        margin: 12px 0 !important;
-        padding: 10px 0 !important;
-        border-bottom: 1px solid #333 !important;
-        color: #000 !important;
-        font-size: 16px !important;
-        line-height: 1.6 !important;
-        text-align: right !important;
-        direction: rtl !important;
-        page-break-inside: avoid !important;
-    }
-    
-    /* تحسين العنوان الرئيسي */
-    .ref-number {
-        color: #000 !important;
-        font-size: 24px !important;
-        border: 2px solid #000 !important;
-        padding: 15px !important;
-        margin: 20px 0 !important;
-    }
-    
-    /* منع انقطاع الصفحة داخل العناصر المهمة */
-    .modal-icon,
-    h2,
-    .ref-number,
-    .booking-details {
-        page-break-inside: avoid !important;
-        page-break-after: avoid !important;
-    }
-    
-    /* تحسين الخطوط للطباعة */
-    body, .modal-content {
-        font-family: 'Arial', 'Helvetica', sans-serif !important;
-        font-size: 14px !important;
-        line-height: 1.5 !important;
-    }
-}
-
-
     </style>
 </head>
 <body>
 
-    <!-- الهيدر في الأعلى -->
+    <!-- الشعار في الأعلى -->
     <div class="main-header">
         <div class="logo-wrapper">
             <!-- اسم الملف: iraqi-grain-logo.png -->
             <img src="iraqi-grain-logo.png" class="iraqi-grain-logo">
         </div>
-        <div class="system-title">نظام الحجز المسبق ومواعيد التسويق لعام 2026</div>
+        <div class="system-title">نظام الحجز المسبق ومواعيد التسويق</div>
         <div class="system-subtitle">الهيئة العامة لتجارة الحبوب</div>
     </div>
 
@@ -404,14 +198,16 @@
 
     <!-- محتوى النموذج -->
     <div class="container" id="bookingContainer">
-        <!-- العناوين في الأعلى -->
-        <div class="header-text">
-            <div style="display: flex; justify-content: center; align-items: center; gap: 20px;">
-                <img src="iraqi-grain-logo.png" class="branch-logo">
+        <!-- عناوين الفرع (في النموذج) -->
+        <div class="branch-header">
+            <img src="iraqi-grain-logo.png" class="branch-logo">
+            <div class="branch-info">
+                <h2 id="headerBranchName"></h2>
+                <!-- العنوان الفرع -->
             </div>
-            <h2 id="headerBranchName" style="font-size: 22px; font-weight: bold; color: var(--primary-color); text-align: center;">-</h2>
-            <h1 style="color: var(--primary-color); margin-bottom: 5px;">نظام الحجز المسبق ومواعيد التسويق لعام 2026</h1>
-            <p style="text-align: center; color: #666;">يرجى ملء البيانات بدقة</p>
+            <!-- العنوان النظام -->
+            <h1 style="text-align: center; color: var(--primary-color); margin-bottom: 10px;">نظام الحجز المسبق ومواعيد التسويق</h1>
+            <p style="text-align: center;">يرجى ملء البيانات بدقة</p>
         </div>
         
         <form id="bookingForm" novalidate>
@@ -437,57 +233,55 @@
                 <select id="bookingDate" required onchange="updateCapacityUI()">
                     <option value="" disabled selected>اختر التاريخ...</option>
                 </select>
-                <div id="capacityStatus" class="capacity-display" style="display:none;">
-                    <span id="statusText">الحجوزات:</span>
-                    <span id="countDisplay">0/-</span>
+                <div>
+                    <div id="capacityStatus" class="capacity-display" style="display:none;">
+                        <span id="statusText">الحجوزات:</span>
+                        <span id="countDisplay">0/-</span>
+                    </div>
                 </div>
-            </div>
-            <button type="submit" class="btn-submit" id="submitBtn">
-                <span class="spinner" id="loadingSpinner"></span>
-                <span id="btnText">تأكيد الحجز</span>
-            </button>
+                <button type="submit" class="btn-submit" id="submitBtn">
+                    <span class="spinner" id="loadingSpinner"></span><span id="btnText">تأكيد الحجز</span>
+                </button>
         </form>
     </div>
 
     <!-- وصل الحجز -->
     <div class="modal-overlay" id="successModal">
         <div class="modal-content">
-            <!-- العناوين في الأعلى للقراءة -->
-            <div style="display: flex; justify-content: space-between; margin-bottom: 15px; display: none;" id="printHeader">
-                <div style="text-align: center; margin-top: 15px;">
-                    <!-- الشعار -->
-                    <img src="iraqi-grain-logo.png" style="width: 80px; height: 80px; border: 2px solid var(--wheat-color); border-radius: 50%; display: block; margin: 0 auto 10px;">
-                    <div>
+            <!-- العناوين في الأعلى -->
+            <div class="ticket-wrapper">
+                <!-- الشعار الصغير -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div style="text-align: center;">
                         <div style="font-size: 14px; font-weight: bold; color: #003366;">IRAQI GRAIN</div>
-                        <div style="font-size: 12px; color: #003366;">SYSTEM 1939</div>
+                        <div style="font-size: 14px; color: #003366;">SYSTEM 1939</div>
                     </div>
-                </div>
-                
-                <!-- العناوين (الفرع + العنوان العام) -->
-                <div style="text-align: center; margin-bottom: 15px;">
+                    <!-- عنوان الفرع في الأعلى -->
                     <h2 id="modalBranchName">-</h2>
-                    <h3 style="color: #333; margin-bottom: 10px;">تم الحجز بنجاح</h3>
+                    <h3 style="color: var(--text-color); margin-bottom: 10px;">تم الحجز بنجاح</h3>
+                    
+                    <label style="font-size: 16px; color: #666; font-weight: normal;">رقم الحجز:</label>
+                    <span id="refNumberDisplay" class="ref-number">00</span>
+                    
+                    <div class="booking-details" id="bookingDetailsContent"></div>
                 </div>
-
-                <label style="font-size: 16px; color: #666; font-weight: normal;">رقم الحجز:</label>
-                <span id="refNumberDisplay" class="ref-number">00</span>
                 
-                <div class="booking-details" id="bookingDetailsContent" style="display: none;"></div>
-            </div>
-
-            <div class="modal-actions" id="downloadActions" style="display: none;">
-                <button class="btn-modal btn-save-image" onclick="saveAsImage()">
-                    <i class="fas fa-camera"></i> حفظ كصورة
-                </button>
-                <button class="btn-modal btn-save-pdf" onclick="saveAsPDF()">
-                    <i class="fas fa-file-pdf"></i> حفظ ملف PDF
-                </button>
-                <button class="btn-modal btn-close" onclick="closeModal()">إغلاق</button>
+                <div class="modal-actions" id="downloadActions">
+                    <button class="btn-modal btn-save-image" onclick="saveAsImage()">
+                        <i class="fas fa-camera"></i> حفظ كصورة
+                    </button>
+                    <button class="btn-modal btn-save-pdf" onclick="saveAsPDF()">
+                        <i class="fas fa-file-pdf"></i> حفظ ملف PDF
+                    </button>
+                    <button class="btn-modal btn-close" onclick="closeModal()">إغلاق
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
+        // إعدادات Firebase الجديدة (wheatmarketingsystem)
         const firebaseConfig = {
             apiKey: "AIzaSyANWvhLPij3mGv8apl2T_XnGA9EgEQaeNY",
             authDomain: "wheatmarketingsystem.firebaseapp.com",
@@ -497,7 +291,7 @@
             messagingSenderId: "334676226552",
             appId: "1:334676226552:web:2304c9a4b354370b90a60d"
         };
-        firebase.initializeApp(firebaseConfig).database();
+        const db = firebase.initializeApp(firebaseConfig).database();
 
         let MAX_BOOKINGS = 100;
         const dateSelect = document.getElementById('bookingDate');
@@ -513,101 +307,89 @@
             const container = document.querySelector('.container');
             const mainHeader = document.querySelector('.main-header');
             
-            selector.style.display = 'flex';
+            // إظهار الشعار العام في الأعلى دائماً
+            mainHeader.style.display = 'flex'; 
             container.style.display = 'none'; // إخفاء النموذج في البداية
-            mainHeader.style.display = 'flex'; // إظهار الهيدر في البداية
-
+            
             // جلب الفروع
+            await loadBranches();
+        });
+
+        // 1. تحميل الفروع
+        async function loadBranches() {
+            const select = document.getElementById('branchSelect');
+            select.innerHTML = '<option value="" disabled selected>اختر الفرع...</option>';
+            
             const snap = await db.ref('branches').once('value');
             const branches = snap.val();
             if(branches) {
-                const select = document.getElementById('branchSelect');
-                select.innerHTML = '<option value="" disabled selected>اختر الفرع...</option>';
                 Object.keys(branches).forEach(key => {
                     const b = branches[key];
                     const opt = document.createElement('option');
-                    opt.value = key; opt.textContent = b.branchName;
+                    opt.value = key;
+                    opt.textContent = b.branchName;
                     select.appendChild(opt);
                 });
             } else {
                 const opt = document.createElement('option');
-                opt.disabled = true; opt.textContent = "لا توجد فروع (يرجى إضافتها من الإدارة العامة)";
+                opt.disabled = true; opt.textContent = "لا توجد فروع (راجع إدارتها من الإدارة العامة)";
                 select.appendChild(opt);
             }
-        });
+        }
 
-        // دالة تحميل البيانات عند اختيار الفرع
+        // 2. عند اختيار الفرع: تحميل بيانات الفرع + عرض الشعار والنموذج
         async function loadBranchData() {
             const branchId = document.getElementById('branchSelect').value;
             if(!branchId) return;
 
+            // حفظ معرف الفرع
             currentBranchId = branchId;
             const snap = await db.ref('branches/' + branchId).once('value');
-            if(!snap.exists()) {
-                alert("الفرع غير موجود. يرجى التأكد من الرابط.");
-                location.href = "admin.html";
-                return;
-            }
+            if(!snap.exists()) return alert("الفرع غير موجود. يرجى التأكد من الرابط.");
             currentBranchData = snap.val();
 
-            // إظهار الهيدر والنموذج
-            const selector = document.querySelector('.branch-selector-container');
-            const container = document.querySelector('.container');
+            // إظهار شعار الفرع في الأعلى (مشابه admin.html)
             const mainHeader = document.querySelector('.main-header');
-            const headerText = document.querySelector('.header-text');
-            const branchLogo = document.querySelector('.branch-logo');
+            const logoImg = mainHeader.querySelector('.iraqi-grain-logo');
+            logoImg.src = 'iraqi-grain-logo.png'; // تحديث الشعار ليكون شعار الفرع
 
-            // إخفاء قائمة الفروع وإظهار الهيدر العام + النموذج
-            selector.style.display = 'none';
-            container.style.display = 'block';
-            headerText.style.display = 'block';
+            // تحديث العنوان الرئيسي في النظام
+            const sysTitle = mainHeader.querySelector('.system-title');
+            sysTitle.textContent = "نظام الحجز المسبق ومواعيد التسويق";
+
+            // إظهار الشعار والنموذج
+            const branchSelector = document.querySelector('.branch-selector-container');
+            const container = document.querySelector('.container');
+            const branchHeader = document.querySelector('.branch-header');
+            const branchLogo = branchHeader.querySelector('.branch-logo');
+
+            // إظهار الشعار الفرع
+            branchLogo.style.display = 'flex';
             
-            // تحديث العناوين في النموذج
-            document.getElementById('headerBranchName').textContent = "فرع: " + (currentBranchData.branchName || 'غير محدد');
-
-            // إظهار الشعار في النموذج
-            branchLogo.src = 'iraqi-grain-logo.png'; // إعادة تحميل الصورة للتأكد ظهورها
-
-            // تحميل المواقع الخاصة بالفرع
-            await loadSites();
-
-            // تحميل أنواع السيارات
-            const carTypeSelect = document.getElementById('carType');
-            carTypeSelect.innerHTML = '<option value="" disabled selected>اختر الفرع أولاً...</option>';
-            if(currentBranchData.info && currentBranchData.info.carTypes) {
-                currentBranchData.info.carTypes.forEach(type => {
-                    const opt = document.createElement('option');
-                    opt.value = type; opt.textContent = type;
-                    carTypeSelect.appendChild(opt);
-                });
-            } else {
-                const opt = document.createElement('option');
-                opt.disabled = true; opt.textContent = "لا توجد أنواع محددة (راجع إعدادات الفرع)";
-                carTypeSelect.appendChild(opt);
-            }
-
-            // تهيئة التواريخ
-            const config = currentBranchData.info || {};
-            MAX_BOOKINGS = config.maxLimit || 100;
-            if (config.startDate && config.endDate) {
-                initDates(config.startDate, config.endDate);
-            } else {
-                document.getElementById('bookingDate').innerHTML = '<option value="" disabled selected>يرجى تعيين تواريخ من إعدادات الفرع</option>';
-                document.getElementById('bookingDate').disabled = true;
-            }
+            // إظهار القائمة الفرع والنموذج
+            branchSelector.style.display = 'none';
+            container.style.display = 'block'; // إظهار النموذج
+            branchHeader.style.display = 'flex'; // إظهار العنوان الفرع داخل النموذج
+            
+            // تحديث العنوان الفرع
+            const headerTitle = branchHeader.querySelector('.header-title');
+            headerTitle.textContent = "فرع: " + (currentBranchData.branchName || 'غير محدد');
         }
 
-        // دالة جلب المواقع
+        // 3. دالة تحميل البيانات (جلب المواقع والسيارات)
         async function loadSites() {
             const siteSelect = document.getElementById('marketingSite');
-            const carTypeSelect = document.getElementById('carType');
-            siteSelect.innerHTML = '<option value="" disabled selected>اختر الفرع أولاً...</option>';
+           // const carTypeSelect = document.getElementById('carType');
+            
+            // تعبئة المواقع من الفرع
             const siteSnap = await db.ref(`branches/${currentBranchId}/sites`).once('value');
-            const sites = siteSnap.val();
-            if(sites) {
+            siteSelect.innerHTML = '<option value="" disabled selected>اختر الموقع...</option>';
+            if(siteSnap.exists()) {
+                const sites = siteSnap.val();
                 Object.keys(sites).forEach(name => {
                     const opt = document.createElement('option');
-                    opt.value = name; opt.textContent = name;
+                    opt.value = name;
+                    opt.textContent = name;
                     siteSelect.appendChild(opt);
                 });
             } else {
@@ -615,17 +397,31 @@
                 opt.disabled = true; opt.textContent = "لا توجد مواقع (راجع إعدادات الفرع)";
                 siteSelect.appendChild(opt);
             }
+
+            // تعبئة أنواع السيارات من الفرع
+            const carTypeSelect = document.getElementById('carType');
+            carTypeSelect.innerHTML = '<option value="" disabled selected>اختر الفرع أولاً...</option>';
+            if(currentBranchData.info && currentBranchData.info?.carTypes) {
+                currentBranchData.info.carTypes.forEach(type => {
+                    const opt = document.createElement('option');
+                    opt.value = type;
+                    opt.textContent = type;
+                    carTypeSelect.appendChild(opt);
+                });
+            } else {
+                const opt = document.createElement('option');
+                opt.disabled = true; opt.textContent = "لا توجد أنواع محددة (راجع إعدادات الفرع)";
+                carTypeSelect.appendChild(opt);
+            }
         }
 
         function initDates(startDateStr, endDateStr) {
             if(!startDateStr || !endDateStr) {
                 document.getElementById('bookingDate').innerHTML = '<option value="" disabled selected>يرجى تعيين تواريخ من إعدادات الفرع</option>';
-                document.getElementById('bookingDate').disabled = true;
                 return;
             }
             document.getElementById('bookingDate').innerHTML = '<option value="" disabled selected>اختر التاريخ...</option>';
-            document.getElementById('bookingDate').disabled = false;
-
+            
             const startDate = new Date(startDateStr);
             const endDate = new Date(endDateStr);
             let currentDate = startDate;
@@ -644,12 +440,12 @@
 
       async  function getCurrentCount(date, site) {
             try { 
-                const snapshot = await db.ref(`branches/${currentBranchId}/counters/${site}/${date}`).once('value'); 
-                return snapshot.val() || 0; 
+                const snapshot = await db.ref(`branches/${currentBranchId}/counters/${site}/${date}`).once('value');
+                return snapshot.val() || 0;
             } catch (e) { return 0; }
         }
 
-      async  function updateCapacityUI() {
+     async   function updateCapacityUI() {
             const site = siteSelect.value;
             const date = dateSelect.value;
             if (!site || !date) { document.getElementById('capacityStatus').style.display = 'none'; return; }
@@ -683,10 +479,8 @@
 
         document.getElementById('bookingForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            // تعريف الحقول بدقة من الـ IDs
             const fields = {
-                'marketingSite': 'الموقع', 'marketerName': 'المسوق',
-                'agricultureBook': 'رقم كتاب الزراعة', 'bookDate': 'تاريخ الكتاب', 'carNumber': 'السيارة', 'driverName': 'السائق', 'carType': 'نوع', 'bookingDate': 'التاريخ'
+                'marketingSite': 'الموقع', 'marketerName': 'المسوق', 'agricultureBook': 'رقم كتاب الزراعة', 'bookDate': 'تاريخ الكتاب', 'carNumber': 'السيارة', 'driverName': 'السائق', 'carType': 'نوع', 'bookingDate': 'التاريخ'
             };
             for (let key in fields) {
                 const el = document.getElementById(key);
@@ -698,7 +492,7 @@
                 }
             }
             const formData = {
-                site: document.getElementById('marketingSite').value,
+                site: siteSelect.value,
                 marketer: document.getElementById('marketerName').value,
                 agBook: document.getElementById('agricultureBook').value,
                 bookDate: document.getElementById('bookDate').value,
@@ -720,7 +514,6 @@
                         setLoading(false);
                     } else {
                         const newBookingId = snapshot.val();
-                        // التحقق من تكرار كتاب الزراعة + نوع السيارة
                         await validateAdvancedRules(formData, newBookingId);
                         checkCarAndSave(formData, newBookingId);
                     }
@@ -747,19 +540,21 @@
             const datesToCheck = getPastDates(data.date,5);
             const promises = datesToCheck.map(d => db.ref(`branches/${currentBranchId}/bookings`).child(d).once('value'));
             const snapshots = await Promise.all(promises);
+            
             for (let i = 0; i < snapshots.length; i++) {
                 const snap = snapshots[i];
                 if (snap.exists()) {
                     let foundInHistory = false; let foundDate = "";
                     snap.forEach(childSnapshot => {
                         const val = childSnapshot.val();
+                        // قاعدة: نفس الكتاب + نفس السيارة
                         if (val.agBook === data.agBook && val.carNum === data.carNum) {
                             foundInHistory = true; foundDate = datesToCheck[i];
                             return true;
                         }
                     });
                     if (foundInHistory) {
-                        if (foundDate !== data.date) {
+                        if(foundDate !== data.date) {
                             throw new Error(`لا يمكن الحجز: تم حجز هذا الكتاب مع نفس السيارة بتاريخ ${foundDate}. يلزم فاصل 5 أيام.`);
                         }
                     }
@@ -769,7 +564,6 @@
 
         async function checkCarAndSave(data, bookingId) {
             try {
-                // البحث في الفرع
                 const snap = await db.ref(`branches/${currentBranchId}/bookings`).child(data.date).once('value');
                 let carExists = false;
                 if (snap.exists()) {
@@ -781,7 +575,6 @@
                 
                 // الحفظ في الفرع
                 await db.ref(`branches/${currentBranchId}/bookings`).child(data.date).push({ ...data, bookingId, timestamp: Date.now() });
-                
                 currentBookingData = { ...data, bookingId };
                 showSuccessModal(data, bookingId);
                 document.getElementById('bookingForm').reset();
@@ -794,12 +587,13 @@
             }
         }
 
-        // دالة حفظ الصورة
         function saveAsImage() {
             const element = document.querySelector('.modal-content');
             const buttons = document.getElementById('downloadActions');
             buttons.style.display = 'none';
-            html2canvas(element, { scale: 2, backgroundColor: "#ffffff", useCORS: true }).then(canvas => {
+            html2canvas(element, {
+                scale: 2, backgroundColor: "#ffffff", useCORS: true
+            }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `حجز_${currentBookingData.date}_${currentBookingData.bookingId}.png`;
                 link.href = canvas.toDataURL(); link.click();
@@ -827,11 +621,7 @@
         
         function showSuccessModal(data, id) {
             const formattedBookDate = data.bookDate ? data.bookDate.replace(/-/g, '/') : '-';
-            // إظهار العناوين وتفاصيلات الحجز للقراءة
-            const bookingDetailsContent = document.getElementById('bookingDetailsContent');
-            bookingDetailsContent.style.display = 'block';
-            
-            bookingDetailsContent.innerHTML = `
+            document.getElementById('bookingDetailsContent').innerHTML = `
                 <p><strong>الموقع:</strong> ${data.site}</p>
                 <p><strong>التاريخ:</strong> ${data.date}</p>
                 <p><strong>المسوق:</strong> ${data.marketer || '-'}</p>
